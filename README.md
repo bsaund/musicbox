@@ -20,6 +20,7 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 Basic script is written. 
 Now need to integrate with scanner
 Need to handle bluetooth connect/disconnect
+Integrate with systemd (https://tecadmin.net/setup-autorun-python-script-using-systemd/)
 5. Install mopidy IRIS from source: 
 https://github.com/jaedb/Iris
 
