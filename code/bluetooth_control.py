@@ -10,7 +10,7 @@ from mopidy_json_client import MopidyClient
 import time
 from os import path
 
-BLUETOOTH_FILE = '/dev/input/event0'
+BLUETOOTH_FILE = '/dev/input/event1'
 
 mp = MopidyClient()
 
@@ -45,7 +45,7 @@ def listen_on_bluetooth():
             continue
 
         try:
-            device = evdev.InputDevice('/dev/input/event0')
+            device = evdev.InputDevice(BLUETOOTH_FILE)
             print(device)
             # device /dev/input/event1, name "Swisscom RC", phys "AA:BB:CC:DD:EE:FF"
             for event in device.read_loop():
