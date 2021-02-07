@@ -27,8 +27,8 @@ def load_config_file():
 
 def add_all_songs_from_folder(folder):
     d = pathlib.Path(BASE_FP) / folder
-    uris = sorted(['file://' + urllib.parse.quote(fp.as_posix()) for fp in d.glob('[!._]*.mp3')])
-    # uris = [urllib.parse.quote(a) for a in uris]
+    uris = sorted(['file://' + urllib.parse.quote(fp.as_posix()) for fp in d.glob('[!._]*')])
+    uris = [uri for uri in uris if pathlib.Path(uri).suffix in MUSIC_EXTENSIONS]
     mp.tracklist.mopidy_request('core.tracklist.add', uris=uris)
 
 
