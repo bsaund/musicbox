@@ -20,6 +20,14 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 Basic script is written. 
 Now need to integrate with scanner
 Need to handle bluetooth connect/disconnect
+Integrate with systemd (https://tecadmin.net/setup-autorun-python-script-using-systemd/)
 5. Install mopidy IRIS from source: 
 https://github.com/jaedb/Iris
 
+# Barcode scanner
+
+Add `/dev/input/by-id` https://www.raspberrypi.org/forums/viewtopic.php?t=120690
+
+1. Edit udev rules:
+- SUBSYSTEM=="usb", ATTR{idVendor}=="28e9", ATTR{idProduct}=="28e9", MODE="0666"
+- `udevadm control --reload`
