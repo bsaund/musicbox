@@ -24,10 +24,13 @@ Integrate with systemd (https://tecadmin.net/setup-autorun-python-script-using-s
 5. Install mopidy IRIS from source: 
 https://github.com/jaedb/Iris
 
-# Barcode scanner
+### Barcode scanner
 
 Add `/dev/input/by-id` https://www.raspberrypi.org/forums/viewtopic.php?t=120690
 
 1. Edit udev rules:
 - SUBSYSTEM=="usb", ATTR{idVendor}=="28e9", ATTR{idProduct}=="28e9", MODE="0666"
 - `udevadm control --reload`
+
+### Sync from dropbox
+https://www.thedigitalpictureframe.com/how-to-finally-access-dropbox-on-your-raspberry-pi-using-rclone/
