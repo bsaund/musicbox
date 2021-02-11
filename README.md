@@ -3,12 +3,15 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 
 # Setup
 ## Overview
-1. [Set up raspian](#set-up-raspian)
+1. [Set up raspbian](#set-up-raspbian)
 2. [Install mopidy](#install-mopidy)
 3. [Resolve issues](#resolve-issues)
 4. [Set up custom code](#set-up-custom-code)
 
-## Set up raspian
+## Set up raspbian
+- Install raspbian using the [image writer utility](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/). 
+- Boot into raspbian. For convenience, enable ssh and VNC in the `Raspberry Pi Configuration` using the main system menu. You can then use Remmina from ubuntu to remote-desktop into the pi.
+- [Optional] Set a static IP for the raspberry pi in your router.
 
 ## Install mopidy
 
