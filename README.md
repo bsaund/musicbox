@@ -18,8 +18,11 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 - [Enable mopidy as a system.d service](https://docs.mopidy.com/en/latest/running/service/#service-management-with-systemd)
 
 ## Resolve issues
-I had issues making my bluetooth speaker connect nicely. I followed [this link](https://docs.mopidy.com/en/latest/running/service/?highlight=pulseaudio#system-service-and-pulseaudio)
-My bluetooth speaker regularly disconnects. To make sure the raspberry pi connects whenever the bluetooth speaker becomes available I followed [this issue](https://github.com/manjaro/packages-extra/issues/64 ) and
+I had issues making my bluetooth speaker connect nicely. When run as a service mopidy sound would not play over bluetooth.
+I followed [this link](https://docs.mopidy.com/en/latest/running/service/?highlight=pulseaudio#system-service-and-pulseaudio)
+
+
+Also, my bluetooth speaker regularly disconnects. To make sure the raspberry pi connects whenever the bluetooth speaker becomes available I followed [this issue](https://github.com/manjaro/packages-extra/issues/64 ) and
 - Added `load-module module-switch-on-connect` to `/etc/pulse/default.pa` to autoconnect to bluetooth as the speaker turns off and on:
 
 ## Set up custom code
