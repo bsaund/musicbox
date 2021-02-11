@@ -13,10 +13,10 @@ import urllib.parse
 TESTING = False
 
 if TESTING:
-    BASE_FP = "/home/bsaund/Music/Sorted Music"
+    BASE_FP = "/home/bsaund/Dropbox/Music/"
     mp = MopidyClient(ws_url='ws://192.168.1.54:6680/mopidy/ws')
 else:
-    BASE_FP = "/home/pi/Music"
+    BASE_FP = "/home/pi/Dropbox/Music"
     mp = MopidyClient()
 
 

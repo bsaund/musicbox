@@ -5,11 +5,13 @@ import pathlib
 import json
 import urllib.parse
 from mopidy_json_client import MopidyClient
+import time
+from os import path
 
-BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-GD_USB_Keyboard_V1.0-9c6d-event-kbd'
-BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-Netum._HIDKB_18502-event-kbd'
+# BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-GD_USB_Keyboard_V1.0-9c6d-event-kbd'  # Wired scanner
+BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-Netum._HIDKB_18502-event-kbd'  # Wireless scanner
 
-BASE_FP = "/home/pi/Music"
+BASE_FP = "/home/pi/Dropbox/Music"
 CONFIG_FILENAME = ".barcode_config"
 MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 
@@ -60,7 +62,16 @@ class Scanner:
 # for event in scanner.read_loop():
 
 def play_latest_scan():
-    scanner = Scanner(BARCODE_SCANNER_FILEPATH)
+    while not path.exists(BARCODE_SCANNER_FILEPATH):
+        time.sleep(0.1)
+
+    scanner = None
+    while scanner is None:
+        try:
+            scanner = Scanner(BARCODE_SCANNER_FILEPATH)
+        except Exception as e:
+            print(e)
+
     cfg = load_config_file()
     while True:
         barcode_id = scanner.read_scan()
