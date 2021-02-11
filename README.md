@@ -3,7 +3,7 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 
 # Setup
 ## Overview
-1. [Set up raspian](##-set-up-raspian)
+1. [Set up raspian](#set-up-raspian)
 2. Install mopidy
 3. Resolve issues
 4. Set up custom code
