@@ -1,5 +1,15 @@
 # musicbox
-Instructions and code for my raspberry pi music box
+This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface.
+
+# Setup
+## Overview
+1. [Set up raspian](#-set-up-raspian)
+2. Install mopidy
+3. Resolve issues
+4. Set up custom code
+
+## Set up raspian
+
 
 This is still an early work in progress
 
