@@ -14,8 +14,13 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 - [Optional] Set a static IP for the raspberry pi in your router.
 
 ## Install mopidy
+- Follow the [mopidy install instructions for raspian](https://docs.mopidy.com/en/latest/installation/raspberrypi/#how-to-for-raspbian). Be sure to `sudo addusr mopidy` to audio and bluetooth groups
+- [Enable mopidy as a system.d service](https://docs.mopidy.com/en/latest/running/service/#service-management-with-systemd)
 
 ## Resolve issues
+I had issues making my bluetooth speaker connect nicely. I followed [this link](https://docs.mopidy.com/en/latest/running/service/?highlight=pulseaudio#system-service-and-pulseaudio)
+My bluetooth speaker regularly disconnects. To make sure the raspberry pi connects whenever the bluetooth speaker becomes available I followed [this issue](https://github.com/manjaro/packages-extra/issues/64 ) and
+- Added `load-module module-switch-on-connect` to `/etc/pulse/default.pa` to autoconnect to bluetooth as the speaker turns off and on:
 
 ## Set up custom code
 
