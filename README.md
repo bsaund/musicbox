@@ -12,6 +12,7 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 - Install raspbian using the [image writer utility](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/). 
 - Boot into raspbian. For convenience, enable ssh and VNC in the `Raspberry Pi Configuration` using the main system menu. You can then use Remmina from ubuntu to remote-desktop into the pi.
 - [Optional] Set a static IP for the raspberry pi in your router.
+- Connect to your bluetooth speakers, play some test sounds.
 
 ## Install mopidy
 - Follow the [mopidy install instructions for raspian](https://docs.mopidy.com/en/latest/installation/raspberrypi/#how-to-for-raspbian). Be sure to `sudo addusr mopidy` to audio and bluetooth groups
@@ -26,26 +27,33 @@ Also, my bluetooth speaker regularly disconnects. To make sure the raspberry pi 
 - Added `load-module module-switch-on-connect` to `/etc/pulse/default.pa` to autoconnect to bluetooth as the speaker turns off and on:
 
 ## Set up custom code
+- Add the `systemd` service files to `/lib/systemd/system/`
+- `sudo pip3 install` all needed packages. You must `sudo` if using the `systemd` service that runs as root. (TODO: Compile a list. You can figure it out though). 
+- `sudo systemctl enable musicbox-bluetooth.service`
+- `sudo systemctl enable musicbox-scanner.service`
+- For more information on [systemd](https://tecadmin.net/setup-autorun-python-script-using-systemd/)
 
-
-This is still an early work in progress
-
-
-Notes on setting up mopidy on my raspberry pi to work as a music player
-1. Installed raspian
-set up VNC, ssh, bluetooth audio
-2. Installed mopidy: https://docs.mopidy.com/en/latest/installation/debian/#debian-install
-Set up for systemctl
-Update mopidy config file
-`sudo addusr mopidy` to audio and bluetooth (and video?) groups
-3. Make pulseaudio play nicely: https://docs.mopidy.com/en/latest/running/service/?highlight=pulseaudio#system-service-and-pulseaudio
-Add `load-module module-switch-on-connect` to `/etc/pulse/default.pa` to autoconnect to bluetooth as the speaker turns off and on:
-https://github.com/manjaro/packages-extra/issues/64 
-4. TODO: Write python script to respond to mouse events
+### Add the bluetooth remote controller listener
+The `code/bluetooth_control.py` _should_ already work nicely with any remote control. To create this script, I learned from these links:
 https://thehackerdiary.wordpress.com/2017/04/21/exploring-devinput-1/
 https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetooth-remote-hid-over-gatt
-Basic script is written. 
-Now need to integrate with scanner
+
+### Add barcode scanner
+- Connect the barcode scanner and look at the path created on the raspberry pi under `/dev/input/by-id/`
+- Edit the path in `code/barcode_player` 
+- I already had permissions, but if you run into permissions issues check out the udev rules:
+- SUBSYSTEM=="usb", ATTR{idVendor}=="28e9", ATTR{idProduct}=="28e9", MODE="0666"
+- `udevadm control --reload`
+
+### Add Dropbox sync
+- Add any mp3 files to `/home/pi/Dropbox/Music` (note: any filepath works, though you'll need to change the python scripts). Group the music by `catory/band/song.mp3`. You can also create deeper nested files (e.g. `/Pop/The White Stripes/Elephant/songs.mp3`), but at least `category/band` is expected.
+- Optionally sync with Dropbox with `rclone`: https://www.thedigitalpictureframe.com/how-to-finally-access-dropbox-on-your-raspberry-pi-using-rclone/
+- Optionall set up a cron job to periodically sync.
+
+
+
+
+
 Need to handle bluetooth connect/disconnect
 Integrate with systemd (https://tecadmin.net/setup-autorun-python-script-using-systemd/)
 5. Install mopidy IRIS from source: 
@@ -59,5 +67,3 @@ Add `/dev/input/by-id` https://www.raspberrypi.org/forums/viewtopic.php?t=120690
 - SUBSYSTEM=="usb", ATTR{idVendor}=="28e9", ATTR{idProduct}=="28e9", MODE="0666"
 - `udevadm control --reload`
 
-### Sync from dropbox
-https://www.thedigitalpictureframe.com/how-to-finally-access-dropbox-on-your-raspberry-pi-using-rclone/
