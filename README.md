@@ -1,6 +1,8 @@
 # Musicbox
 This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface.
 
+This musicbox is built on mopidy, and therefore could be adapted to all of the mopdiy plugins and websites. 
+
 # Setup
 ## Overview
 1. [Set up raspbian](#set-up-raspbian)
