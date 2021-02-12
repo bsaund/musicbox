@@ -6,7 +6,7 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 1. [Set up raspbian](#set-up-raspbian)
 2. [Install mopidy](#install-mopidy)
 3. [Resolve issues](#resolve-issues)
-4. [Set up custom code](#set-up-custom-code)
+4. [Set up custom code](#set-up-custom-code) for the barcode reader and for reacting to the bluetooth remote
 
 ## Set up raspbian
 - Install raspbian using the [image writer utility](https://www.raspberrypi.org/blog/raspberry-pi-imager-imaging-utility/). 
