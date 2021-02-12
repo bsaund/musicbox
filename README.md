@@ -1,4 +1,4 @@
-# musicbox
+# Musicbox
 This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface.
 
 # Setup
