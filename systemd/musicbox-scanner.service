@@ -1,11 +1,11 @@
 [Unit]
-Description=Bluetooth remote control forwarding to mopidy
+Description=Service for launch mopidy songs using a barcode scanner
 After=multi-user.target
 Conflicts=getty@tty1.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/pi/code/custom/bluetooth_control.py
+ExecStart=/usr/bin/python3 /home/pi/musicbox/code/barcode_player.py
 StandardInput=tty-force
 
 [Install]
