@@ -1,6 +1,8 @@
 # Musicbox
 This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface.
 
+![Scanning a barcode](img/scanner_01.jpg)
+
 This musicbox is built on mopidy, and therefore could be adapted to all of the mopdiy plugins and websites. 
 
 
@@ -57,6 +59,8 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 
 
 # Generate your directory
+Check out the `img` folder for an example directory.
+
 - On a computer with your music (not necessarily the raspberry pi), edit the `BASE_FP` filepath in `code/barcode_map.py`
 - Run `python3 barcode_map.py`
 - A pdf with your music is created. Print this out double-sided.
