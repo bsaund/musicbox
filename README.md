@@ -1,5 +1,5 @@
 # Musicbox
-This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface. I give some color commentary in my [blog post](https://www.bradsaund.com/post/music_box/)
+This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface. I give some color commentary in my [blog post](https://www.bradsaund.com/post/music_box/).
 
 ![Scanning a barcode](img/scanner_01.jpg)
 
