@@ -51,6 +51,13 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 - Optionall set up a cron job to periodically sync.
 
 
+# Generate your directory
+- On a computer with your music (not necessarily the raspberry pi), edit the `BASE_FP` filepath in `code/barcode_map.py`
+- Run `python3 barcode_map.py`
+- A pdf with your music is created. Print this out double-sided.
+- Copy the `.barcode_config` file to the raspberry pi (happens automatically if using dropbox sync)
+- Restart the barcode scanner service `sudo systemctl restart musicbox-scanner.service` (or just restart the pi)
+- Scan a barcode. The corresponding album should be playing on the bluetooth speaker.
 
 
 
