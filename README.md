@@ -3,6 +3,9 @@ This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s
 
 This musicbox is built on mopidy, and therefore could be adapted to all of the mopdiy plugins and websites. 
 
+
+If you run into problems, or want more detail, please create an issue
+
 # Setup
 ## Overview
 1. [Set up raspbian](#set-up-raspbian)
