@@ -52,7 +52,7 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 - `udevadm control --reload`
 
 ### Add Dropbox sync
-- Add any mp3 files to `/home/pi/Dropbox/Music` (note: any filepath works, though you'll need to change the python scripts). Group the music by `catory/band/song.mp3`. You can also create deeper nested files (e.g. `/Pop/The White Stripes/Elephant/songs.mp3`), but at least `category/band` is expected.
+- Add any mp3 files to `/home/pi/Dropbox/Music` (note: any filepath works, though you'll need to change the python scripts). Group the music by `category/band/song.mp3`. You can also create deeper nested files (e.g. `/Pop/The White Stripes/Elephant/songs.mp3`), but at least `category/band` is expected.
 - Optionally sync with Dropbox with `rclone`: https://www.thedigitalpictureframe.com/how-to-finally-access-dropbox-on-your-raspberry-pi-using-rclone/
 - Optionall set up a cron job to periodically sync.
 
