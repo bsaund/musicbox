@@ -1,10 +1,11 @@
 # Musicbox
-This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface.
+This is my raspberry pi musicbox. It allows me to play my local music (e.g. mp3s) on a bluetooth speaker by scanning a barcode in a physical binder of my music. As a backup, there is a web interface. I give some color commentary in my [blog post](https://www.bradsaund.com/post/music_box/).
+
+![Scanning a barcode](img/scanner_01.jpg)
 
 This musicbox is built on mopidy, and therefore could be adapted to all of the mopdiy plugins and websites. 
 
-
-If you run into problems, or want more detail, please create an issue
+If you run into problems, or want more detail, please create an issue.
 
 # Setup
 ## Overview
@@ -51,12 +52,14 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 - `udevadm control --reload`
 
 ### Add Dropbox sync
-- Add any mp3 files to `/home/pi/Dropbox/Music` (note: any filepath works, though you'll need to change the python scripts). Group the music by `catory/band/song.mp3`. You can also create deeper nested files (e.g. `/Pop/The White Stripes/Elephant/songs.mp3`), but at least `category/band` is expected.
+- Add any mp3 files to `/home/pi/Dropbox/Music` (note: any filepath works, though you'll need to change the python scripts). Group the music by `category/band/song.mp3`. You can also create deeper nested files (e.g. `/Pop/The White Stripes/Elephant/songs.mp3`), but at least `category/band` is expected.
 - Optionally sync with Dropbox with `rclone`: https://www.thedigitalpictureframe.com/how-to-finally-access-dropbox-on-your-raspberry-pi-using-rclone/
 - Optionall set up a cron job to periodically sync.
 
 
 # Generate your directory
+Check out the `img` folder for an example directory.
+
 - On a computer with your music (not necessarily the raspberry pi), edit the `BASE_FP` filepath in `code/barcode_map.py`
 - Run `python3 barcode_map.py`
 - A pdf with your music is created. Print this out double-sided.
