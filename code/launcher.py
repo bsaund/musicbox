@@ -10,7 +10,7 @@ from mopidy_json_client import MopidyClient
 import pathlib
 import urllib.parse
 
-TESTING = False
+TESTING = True
 
 if TESTING:
     BASE_FP = "/home/bsaund/Dropbox/Music/"
@@ -30,8 +30,9 @@ def add_all_songs_from_folder(folder):
 mp.tracklist.clear()
 print(f"After clearing, there are {len(mp.tracklist.get_tracks())} tracks")
 
-add_all_songs_from_folder('Classical/Devorak/Slavonic Dances Op.46 and Op. 72 - Cleveland, Szell')
+# add_all_songs_from_folder('Classical/Devorak/Slavonic Dances Op.46 and Op. 72 - Cleveland, Szell')
 # add_all_songs_from_folder("Pop/Beatles/Sgt. Pepper's Lonely Hearts Club Bandy")
+mp.tracklist.mopidy_request('core.tracklist.add', uris=['tunein:station:s23407'])
 mp.playback.play()
 
 current_tracks = mp.tracklist.get_tracks()

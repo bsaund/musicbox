@@ -30,7 +30,7 @@ def save_config_file(config: dict):
 
 
 def glob_music_files(path):
-    return [f for f in pathlib.Path(path).glob('*') if f.suffix in MUSIC_EXTENSIONS]
+    return [f for f in pathlib.Path(path).glob('*') if f.suffix in MUSIC_EXTENSIONS or f.name == "stream.txt"]
 
 
 def generate_config_file():

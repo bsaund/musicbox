@@ -29,6 +29,12 @@ def load_config_file():
 
 def add_all_songs_from_folder(folder):
     d = pathlib.Path(BASE_FP) / folder
+    # Specific handling for radio streams
+    if (d / "stream.txt").exists():
+        with (d / "stream.txt").open() as f:
+            mp.tracklist.mopidy_request('core.tracklist.add', uris=[f.readline()])
+        return
+
     uris = sorted(['file://' + urllib.parse.quote(fp.as_posix()) for fp in d.glob('[!._]*')])
     uris = [uri for uri in uris if pathlib.Path(uri).suffix in MUSIC_EXTENSIONS]
     mp.tracklist.mopidy_request('core.tracklist.add', uris=uris)
