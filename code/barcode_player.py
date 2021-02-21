@@ -56,11 +56,6 @@ class Scanner:
                 chars += key
 
 
-# scanner = evdev.InputDevice('/dev/input/by-id/usb-GD_USB_Keyboard_V1.0-9c6d-event-kbd')
-# scanner.grab()
-#
-# for event in scanner.read_loop():
-
 def play_latest_scan():
     while not path.exists(BARCODE_SCANNER_FILEPATH):
         time.sleep(0.1)

@@ -92,8 +92,6 @@ class PDF(FPDF):
         self.cell(0, 10, self.section_name, border=0, ln=0, align=alignment)
         self.set_y(20)
 
-
-
     def add_section_title(self, title):
         self.section_name = ""
         self.add_page()
@@ -115,7 +113,7 @@ class PDF(FPDF):
         for folder in folders:
             if self.get_y() > 250:
                 self.add_page()
-                
+
             rel_fp = pathlib.Path(folder)
             barcode = (fp / rel_fp).as_posix()
             clean_rel_fp = pathlib.Path(*rel_fp.parts[1:-1]).as_posix().encode('ascii', errors='ignore').decode()
@@ -136,11 +134,10 @@ class PDF(FPDF):
                 self.image(selected_fp, x=100, y=img_y - 5, h=25)
                 cover_size = pathlib.Path(selected_fp).stat().st_size
                 # print(f"Adding album cover for {folder}: size: {cover_size/100000} MB")
-                if cover_size/1000000 > 0.3:
+                if cover_size / 1000000 > 0.3:
                     print(f"Cover size for {selected_fp} is over 300KB")
 
             self.ln(8)
-
 
     def add_section(self, folders):
         self.add_section_title(pathlib.Path(list(folders)[0]).parts[0])

@@ -15,10 +15,6 @@ BLUETOOTH_FILE = '/dev/input/event1'
 mp = MopidyClient()
 
 
-# mp.bind_event('track_playback_started', print_track_info)
-# mp.playback.play()
-
-
 def handle_remote_control_key(mp, key_event):
     key_down_events = {"KEY_PAUSECD": mp.playback.pause,
                        "KEY_PLAYCD": mp.playback.play,
@@ -47,7 +43,6 @@ def listen_on_bluetooth():
         try:
             device = evdev.InputDevice(BLUETOOTH_FILE)
             print(device)
-            # device /dev/input/event1, name "Swisscom RC", phys "AA:BB:CC:DD:EE:FF"
             for event in device.read_loop():
                 if event.type == evdev.ecodes.EV_KEY:
                     handle_remote_control_key(mp, event)
