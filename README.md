@@ -21,7 +21,7 @@ If you run into problems, or want more detail, please create an issue.
 - Connect to your bluetooth speakers, play some test sounds.
 
 ## Install mopidy
-- Follow the [mopidy install instructions for raspian](https://docs.mopidy.com/en/latest/installation/raspberrypi/#how-to-for-raspbian). Be sure to `sudo addusr mopidy` to audio and bluetooth groups
+- Follow the [mopidy install instructions for raspian](https://docs.mopidy.com/en/latest/installation/raspberrypi/#how-to-for-raspbian). Be sure to `sudo adduser mopidy` to `audio` and `bluetooth` groups
 - [Enable mopidy as a system.d service](https://docs.mopidy.com/en/latest/running/service/#service-management-with-systemd)
 
 ## Resolve issues
