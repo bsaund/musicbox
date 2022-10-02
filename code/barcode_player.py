@@ -17,6 +17,13 @@ MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 
 mp = MopidyClient()
 
+BARCODE_CONTROLS = {
+    "Pause": lambda playback: playback.pause,
+    "Play": lambda playback: playback.playback.play,
+    "Previous": lambda playback: playback.previous,
+    "Next": lambda playback: playback.next
+}
+
 
 def load_config_file():
     fp = pathlib.Path(BASE_FP) / CONFIG_FILENAME
@@ -62,6 +69,11 @@ class Scanner:
                 chars += key
 
 
+def handle_control_scan(command):
+    print(f"Running command: {command}")
+    BARCODE_CONTROLS[command](mp.playback)
+
+
 def play_latest_scan():
     while not path.exists(BARCODE_SCANNER_FILEPATH):
         time.sleep(0.1)
@@ -76,9 +88,13 @@ def play_latest_scan():
     cfg = load_config_file()
     while True:
         barcode_id = scanner.read_scan()
-        print(f"Playing {cfg[barcode_id]}")
+        barcode_command = cfg[barcode_id].lstrip("Controls/")
+        if barcode_command in BARCODE_CONTROLS:
+            handle_control_scan(barcode_command)
+            continue
+        print(f"Playing {barcode_command}")
         mp.tracklist.clear()
-        add_all_songs_from_folder(cfg[barcode_id])
+        add_all_songs_from_folder(barcode_command)
         mp.playback.play()
 
 

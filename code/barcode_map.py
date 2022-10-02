@@ -13,7 +13,28 @@ CONFIG_FILENAME = ".barcode_config"
 MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 ART_EXTENSIONS = [".jpg", ".png"]
 START_ID = 100
+CONTROL_START_ID = 100000
 
+
+CATEGORIES = [
+    "Controls",
+    "Pop",
+    "Classical",
+    "Film",
+    "Personal",
+    "Radio",
+    "Religious",
+    "Videogame",
+    "z_Extra",
+    "Other"
+]
+
+BARCODE_CONTROLS = [
+    "Pause",
+    "Play",
+    "Previous",
+    "Next"
+]
 
 def load_config_file():
     fp = pathlib.Path(BASE_FP) / CONFIG_FILENAME
@@ -49,6 +70,9 @@ def generate_config_file():
             new_id += 1
         cf[new_id] = rel_dir
         added_configs += 1
+
+    for count, control in enumerate(BARCODE_CONTROLS):
+        cf[CONTROL_START_ID + count] = f"Controls/{control}"
 
     print(f"Added {added_configs} more folders")
     save_config_file(cf)
@@ -151,7 +175,11 @@ class PDF(FPDF):
                 c[path.parts[0]].append(f)
             return c
 
-        for cat, folders_ in sorted(separate_into_categories(folders).items()):
+
+        # for cat, folders_ in sorted(separate_into_categories(folders).items()):
+        categorized = separate_into_categories(folders)
+        for cat in CATEGORIES:
+            folders_ = categorized[cat]
             self.add_section(sorted(folders_))
 
 
@@ -163,8 +191,10 @@ def generate_pdf():
 
     pdf = PDF()
     pdf.add_all_playlists(cf.values())
+    fp = (pathlib.Path(BASE_FP) / 'directory.pdf').as_posix()
     print('Writing to file')
-    pdf.output((pathlib.Path(BASE_FP) / 'directory.pdf').as_posix(), "F")
+    pdf.output(fp, "F")
+    print(f'Wrote directory to {fp}')
 
 
 if __name__ == "__main__":
