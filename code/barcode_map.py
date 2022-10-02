@@ -89,7 +89,12 @@ def generate_barcodes():
         if not image_fp.exists():
             image_fp.mkdir(parents=True)
         image_fp = image_fp.as_posix()
-        EAN8(f'{int(k):07}', writer=ImageWriter()).save(image_fp)
+        options = {
+            'text_distance': 3,
+            'font_size': 3,
+            'module_height': 10
+        }
+        EAN8(f'{int(k):07}', writer=ImageWriter()).save(image_fp, options = options)
 
 
 class PDF(FPDF):
