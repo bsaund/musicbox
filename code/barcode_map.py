@@ -14,6 +14,8 @@ MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 ART_EXTENSIONS = [".jpg", ".png"]
 START_ID = 100
 CONTROL_START_ID = 100000
+EMPTY_DIRS_START = 50000
+NUM_EMPTY_DIRS = 20
 
 
 CATEGORIES = [
@@ -70,6 +72,11 @@ def generate_config_file():
             new_id += 1
         cf[new_id] = rel_dir
         added_configs += 1
+
+    for i in range(NUM_EMPTY_DIRS):
+        print(pathlib.Path("Other/placeholder").as_posix())
+        rel_dir = pathlib.Path("Other/placeholder").as_posix()
+        cf[EMPTY_DIRS_START + i] = rel_dir
 
     for count, control in enumerate(BARCODE_CONTROLS):
         cf[CONTROL_START_ID + count] = f"Controls/{control}"
