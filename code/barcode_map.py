@@ -74,8 +74,7 @@ def generate_config_file():
         added_configs += 1
 
     for i in range(NUM_EMPTY_DIRS):
-        print(pathlib.Path("Other/placeholder").as_posix())
-        rel_dir = pathlib.Path("Other/placeholder").as_posix()
+        rel_dir = pathlib.Path(f"Other/placeholder_{i}").as_posix()
         cf[EMPTY_DIRS_START + i] = rel_dir
 
     for count, control in enumerate(BARCODE_CONTROLS):
