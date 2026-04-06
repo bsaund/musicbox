@@ -19,6 +19,7 @@ NUM_EMPTY_DIRS = 20
 
 
 CATEGORIES = [
+    "Kevin's Favorites",
     "Controls",
     "Pop",
     "Classical",
@@ -191,6 +192,8 @@ class PDF(FPDF):
         categorized = separate_into_categories(folders)
         for cat in CATEGORIES:
             folders_ = categorized[cat]
+            if not folders_:
+                continue
             self.add_section(sorted(folders_))
 
 
