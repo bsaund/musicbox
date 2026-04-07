@@ -8,6 +8,8 @@ Type=simple
 Environment=PYTHONUNBUFFERED=1
 ExecStart=/usr/bin/python3 /home/pi/musicbox/code/barcode_player.py
 StandardInput=tty-force
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target

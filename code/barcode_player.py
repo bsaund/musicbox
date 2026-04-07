@@ -13,13 +13,13 @@ from mopidy_json_client import MopidyClient
 
 from musicbox_paths import music_root, scanner_device_path
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    datefmt="%Y-%m-%dT%H:%M:%S",
-    stream=sys.stderr,
-    force=True,
-)
+if not logging.root.handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+        datefmt="%Y-%m-%dT%H:%M:%S",
+        stream=sys.stderr,
+    )
 logger = logging.getLogger(__name__)
 
 BARCODE_SCANNER_FILEPATH = scanner_device_path()
@@ -28,7 +28,11 @@ BASE_FP = music_root()
 CONFIG_FILENAME = ".barcode_config"
 MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 
-mp = MopidyClient()
+try:
+    mp = MopidyClient()
+except Exception:
+    logger.exception("Failed to create Mopidy client (is Mopidy running?)")
+    raise
 
 BARCODE_CONTROLS = {
     "Pause": lambda playback: playback.pause(),

@@ -49,6 +49,21 @@ class TestMusicRoot(unittest.TestCase):
                 got = musicbox_paths.music_root()
         self.assertEqual(got, target.resolve())
 
+    def test_when_home_is_root_prefers_pi_dropbox_if_present(self):
+        """Matches systemd running as root while Dropbox lives under /home/pi."""
+        with patch("musicbox_paths.Path.home", return_value=Path("/root")):
+            with patch.dict(os.environ, _env_without("MUSICBOX_MUSIC_DIR"), clear=True):
+                with patch.object(Path, "is_dir", lambda self: str(self) == "/home/pi/Dropbox/Music"):
+                    got = musicbox_paths.music_root()
+        self.assertEqual(got, Path("/home/pi/Dropbox/Music").resolve())
+
+    def test_when_home_is_root_and_pi_dropbox_missing_uses_root(self):
+        with patch("musicbox_paths.Path.home", return_value=Path("/root")):
+            with patch.dict(os.environ, _env_without("MUSICBOX_MUSIC_DIR"), clear=True):
+                with patch.object(Path, "is_dir", return_value=False):
+                    got = musicbox_paths.music_root()
+        self.assertEqual(got, Path("/root/Dropbox/Music").resolve())
+
 
 class TestScannerAndBluetooth(unittest.TestCase):
     def test_scanner_default(self):

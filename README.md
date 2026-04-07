@@ -38,6 +38,7 @@ Also, my bluetooth speaker regularly disconnects. To make sure the raspberry pi 
 - `sudo systemctl enable musicbox-bluetooth.service`
 - `sudo systemctl enable musicbox-scanner.service`
 - For more information on [systemd](https://tecadmin.net/setup-autorun-python-script-using-systemd/)
+- **Scanner logs:** `journalctl -u musicbox-scanner.service -b -n 100 --no-pager` (use `-f` to follow). If you only see “exit-code” lines, scroll up for Python tracebacks, or run `python3 ~/musicbox/code/barcode_player.py` in SSH to print errors directly. The bundled unit sends stdout/stderr to the journal and sets `PYTHONUNBUFFERED=1`.
 
 ### Add the bluetooth remote controller listener
 The `code/bluetooth_control.py` _should_ already work nicely with any remote control. To create this script, I learned from these links:
