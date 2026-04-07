@@ -8,10 +8,11 @@ from mopidy_json_client import MopidyClient
 import time
 from os import path
 
-# BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-GD_USB_Keyboard_V1.0-9c6d-event-kbd'  # Wired scanner
-BARCODE_SCANNER_FILEPATH = '/dev/input/by-id/usb-Netum._HIDKB_18502-event-kbd'  # Wireless scanner
+from musicbox_paths import music_root, scanner_device_path
 
-BASE_FP = "/home/pi/Dropbox/Music"
+BARCODE_SCANNER_FILEPATH = scanner_device_path()
+
+BASE_FP = music_root()
 CONFIG_FILENAME = ".barcode_config"
 MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 

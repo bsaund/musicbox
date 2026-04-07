@@ -2,13 +2,13 @@
 import json
 import pathlib
 import os
+from musicbox_paths import music_root
 from barcode import EAN8
 from barcode.writer import ImageWriter
 from fpdf import FPDF
 from collections import defaultdict
 
-# BASE_FP = "/home/pi/Dropbox/Music"
-BASE_FP = "/home/bsaund/Dropbox/Music/"
+BASE_FP = music_root()
 CONFIG_FILENAME = ".barcode_config"
 MUSIC_EXTENSIONS = [".mp3", ".m4a"]
 ART_EXTENSIONS = [".jpg", ".png"]

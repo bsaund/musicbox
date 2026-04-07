@@ -60,7 +60,8 @@ https://stackoverflow.com/questions/54745576/detecting-the-buttons-on-a-bluetoot
 # Generate your directory
 Check out the `img` folder for an example directory.
 
-- On a computer with your music (not necessarily the raspberry pi), edit the `BASE_FP` filepath in `code/barcode_map.py`
+- On a computer with your music (not necessarily the raspberry pi), run from the `code/` directory. By default the library path is **`~/Dropbox/Music`** on whatever machine you use (laptop user vs `pi` does not need to be edited). To use a different folder, set **`MUSICBOX_MUSIC_DIR`** (or pass it in systemd with `Environment=MUSICBOX_MUSIC_DIR=/path`).
+- Optional: set **`MUSICBOX_SCANNER_DEVICE`** or **`MUSICBOX_BLUETOOTH_INPUT`** to your `/dev/input/...` paths if they differ from the defaults in `code/musicbox_paths.py`.
 - Run `python3 barcode_map.py`
 - A pdf with your music is created. Print this out double-sided.
 - Copy the `.barcode_config` file to the raspberry pi (happens automatically if using dropbox sync)

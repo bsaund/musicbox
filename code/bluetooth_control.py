@@ -10,7 +10,9 @@ from mopidy_json_client import MopidyClient
 import time
 from os import path
 
-BLUETOOTH_FILE = '/dev/input/event1'
+from musicbox_paths import bluetooth_input_device
+
+BLUETOOTH_FILE = bluetooth_input_device()
 
 mp = MopidyClient()
 
