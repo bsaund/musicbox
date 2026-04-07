@@ -1,14 +1,26 @@
 #!/usr/bin/env python3
 
 import evdev
-import pathlib
 import json
-import urllib.parse
-from mopidy_json_client import MopidyClient
+import logging
+import pathlib
+import sys
 import time
+import urllib.parse
 from os import path
 
+from mopidy_json_client import MopidyClient
+
 from musicbox_paths import music_root, scanner_device_path
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+    stream=sys.stderr,
+    force=True,
+)
+logger = logging.getLogger(__name__)
 
 BARCODE_SCANNER_FILEPATH = scanner_device_path()
 
@@ -29,10 +41,13 @@ BARCODE_CONTROLS = {
 def load_config_file():
     fp = pathlib.Path(BASE_FP) / CONFIG_FILENAME
     if not fp.exists():
+        logger.warning("Config file does not exist: %s", fp)
         return {}
     with fp.open() as f:
         cfg = json.load(f)
-    return {int(k): v for k, v in cfg.items()}
+    out = {int(k): v for k, v in cfg.items()}
+    logger.info("Loaded %d barcode entries from %s", len(out), fp)
+    return out
 
 
 def add_all_songs_from_folder(folder):
@@ -71,11 +86,23 @@ class Scanner:
 
 
 def handle_control_scan(command):
-    print(f"Running command: {command}")
-    BARCODE_CONTROLS[command](mp.playback)
+    logger.info("Control command: %s", command)
+    try:
+        BARCODE_CONTROLS[command](mp.playback)
+    except KeyError:
+        logger.error(
+            "Unknown control command %r; expected one of %s",
+            command,
+            sorted(BARCODE_CONTROLS),
+        )
 
 
 def play_latest_scan():
+    logger.info(
+        "Starting barcode scanner service (music_root=%s, scanner_device=%s)",
+        BASE_FP,
+        BARCODE_SCANNER_FILEPATH,
+    )
     while not path.exists(BARCODE_SCANNER_FILEPATH):
         time.sleep(0.1)
 
@@ -83,22 +110,47 @@ def play_latest_scan():
     while scanner is None:
         try:
             scanner = Scanner(BARCODE_SCANNER_FILEPATH)
-        except Exception as e:
-            print(e)
+        except Exception:
+            logger.exception(
+                "Could not open scanner device %s; retrying",
+                BARCODE_SCANNER_FILEPATH,
+            )
+
+    logger.info("Scanner device ready: %s", BARCODE_SCANNER_FILEPATH)
 
     cfg = load_config_file()
     while True:
-        barcode_id = scanner.read_scan()
-        barcode_command = cfg[barcode_id]
-        if barcode_command.startswith("Controls/"):
-            barcode_command = barcode_command.lstrip("Controls/")
-            handle_control_scan(barcode_command)
-            continue
-        print(f"Playing {barcode_command}")
-        mp.tracklist.clear()
-        add_all_songs_from_folder(barcode_command)
-        mp.playback.play()
+        try:
+            barcode_id = scanner.read_scan()
+            if barcode_id not in cfg:
+                logger.error(
+                    "Unknown barcode id %s — not in config %s (%d entries loaded)",
+                    barcode_id,
+                    pathlib.Path(BASE_FP) / CONFIG_FILENAME,
+                    len(cfg),
+                )
+                continue
+            barcode_command = cfg[barcode_id]
+            if barcode_command.startswith("Controls/"):
+                barcode_command = barcode_command.lstrip("Controls/")
+                handle_control_scan(barcode_command)
+                continue
+            logger.info("Playing folder: %s", barcode_command)
+            mp.tracklist.clear()
+            add_all_songs_from_folder(barcode_command)
+            mp.playback.play()
+        except KeyboardInterrupt:
+            raise
+        except Exception:
+            logger.exception("Error while handling scan")
 
 
 if __name__ == "__main__":
-    play_latest_scan()
+    try:
+        play_latest_scan()
+    except KeyboardInterrupt:
+        logger.info("Exiting on keyboard interrupt")
+        raise
+    except Exception:
+        logger.exception("Fatal error; scanner service exiting")
+        raise
