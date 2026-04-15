@@ -34,7 +34,11 @@ Also, my bluetooth speaker regularly disconnects. To make sure the raspberry pi 
 
 ## Set up custom code
 - Add the `systemd` service files to `/lib/systemd/system/`
-- `sudo pip3 install` all needed packages. You must `sudo` if using the `systemd` service that runs as root. (TODO: Compile a list. You can figure it out though). 
+- Install all dependencies (apt + pip) in one step:
+  ```
+  sudo bash scripts/install_dependencies.sh
+  ```
+  Or install pip packages only: `pip3 install -r scripts/requirements.txt`
 - `sudo systemctl enable musicbox-bluetooth.service`
 - `sudo systemctl enable musicbox-scanner.service`
 - For more information on [systemd](https://tecadmin.net/setup-autorun-python-script-using-systemd/)

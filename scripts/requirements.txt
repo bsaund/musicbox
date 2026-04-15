@@ -1,0 +1,19 @@
+# Python dependencies for musicbox
+#
+# Install with:
+#   pip3 install -r scripts/requirements.txt
+#
+# Or run scripts/install_dependencies.sh which handles both pip and apt packages.
+
+# ── Barcode scanner service (barcode_player.py, bluetooth_control.py) ──────
+evdev                 # read keyboard/HID input events from /dev/input/*
+mopidy-json-client    # control Mopidy via its JSON-RPC WebSocket API
+
+# ── PDF directory generator (barcode_map.py) ───────────────────────────────
+python-barcode[images]  # generate EAN-8 barcode images (ImageWriter needs Pillow)
+fpdf2                   # build the printable PDF binder directory
+
+# ── CD ripper (rip_cd.py) ──────────────────────────────────────────────────
+discid          # read disc TOC from the CD drive (needs libdiscid0 system library)
+musicbrainzngs  # query MusicBrainz and Cover Art Archive
+requests        # HTTP fallback for cover art download
