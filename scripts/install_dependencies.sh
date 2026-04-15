@@ -4,9 +4,13 @@
 # Install all system (apt) and Python (pip) dependencies for musicbox.
 # Safe to run multiple times — skips packages that are already present.
 #
-# Usage:
-#   cd /path/to/musicbox
-#   sudo bash scripts/install_dependencies.sh
+# Assumes Python packages are installed into the active virtual environment
+# (i.e. run this from an activated venv — do NOT run with sudo).
+# apt packages that are missing will be installed via sudo apt-get.
+#
+# Usage (activate your venv first):
+#   source /path/to/venv/bin/activate
+#   bash scripts/install_dependencies.sh
 
 set -euo pipefail
 
@@ -55,9 +59,9 @@ if [[ "$APT_AVAILABLE" == true ]]; then
     done
 
     if [[ ${#MISSING_APT[@]} -gt 0 ]]; then
-        log "Installing apt packages: ${MISSING_APT[*]}"
-        apt-get update -qq
-        apt-get install -y "${MISSING_APT[@]}"
+        log "Installing apt packages (requires sudo): ${MISSING_APT[*]}"
+        sudo apt-get update -qq
+        sudo apt-get install -y "${MISSING_APT[@]}"
     else
         log "All apt packages already installed."
     fi
@@ -68,6 +72,14 @@ fi
 if ! command -v python3 &>/dev/null; then
     warn "python3 not found. Cannot install Python dependencies."
     exit 1
+fi
+
+if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+    log "Active venv: $VIRTUAL_ENV"
+else
+    warn "No active virtual environment detected (VIRTUAL_ENV is unset)."
+    warn "Python packages will be installed into whichever 'python3' is on PATH."
+    warn "Consider activating a venv first: source /path/to/venv/bin/activate"
 fi
 
 if ! command -v pip3 &>/dev/null; then

@@ -5,7 +5,8 @@
 #   bash /path/to/musicbox/scripts/rip_cd
 #
 # What it does:
-#   1. Installs missing apt and pip dependencies (requires sudo on first run).
+#   1. Installs missing apt and pip dependencies on first run.
+#      apt packages are installed via sudo; pip packages go into the active venv.
 #   2. Runs code/rip_cd.py, which rips the CD, fetches album art, and ejects.
 
 set -euo pipefail
@@ -26,8 +27,8 @@ for pkg in discid musicbrainzngs requests; do
 done
 
 if [[ "$DEPS_OK" == false ]]; then
-    echo "[rip_cd] Some dependencies are missing. Installing (may prompt for sudo)..."
-    sudo bash "$SCRIPT_DIR/install_dependencies.sh"
+    echo "[rip_cd] Some dependencies are missing. Installing..."
+    bash "$SCRIPT_DIR/install_dependencies.sh"
 fi
 
 # ── Run the ripper ───────────────────────────────────────────────────────────
