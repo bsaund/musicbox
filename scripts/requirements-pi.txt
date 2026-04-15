@@ -1,0 +1,14 @@
+# Python dependencies for the Raspberry Pi services
+# (barcode_player.py and bluetooth_control.py)
+#
+# Install on the Pi with:
+#   pip install -r scripts/requirements-pi.txt
+#
+# Note: mopidy-json-client is not on PyPI; it is installed directly from GitHub.
+
+# ── Barcode scanner + bluetooth remote services ────────────────────────────
+evdev  # read keyboard/HID input events from /dev/input/*
+
+# mopidy-json-client: control Mopidy via its JSON-RPC WebSocket API
+# Not on PyPI — installed from GitHub:
+https://github.com/ismailof/mopidy-json-client/archive/master.zip

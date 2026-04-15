@@ -1,13 +1,7 @@
 # Python dependencies for musicbox
+# Install with:  pip install -r scripts/requirements.txt
 #
-# Install with:
-#   pip3 install -r scripts/requirements.txt
-#
-# Or run scripts/install_dependencies.sh which handles both pip and apt packages.
-
-# ── Barcode scanner service (barcode_player.py, bluetooth_control.py) ──────
-evdev                 # read keyboard/HID input events from /dev/input/*
-mopidy-json-client    # control Mopidy via its JSON-RPC WebSocket API
+# See also requirements-pi.txt for packages needed on the Raspberry Pi.
 
 # ── PDF directory generator (barcode_map.py) ───────────────────────────────
 python-barcode[images]  # generate EAN-8 barcode images (ImageWriter needs Pillow)
