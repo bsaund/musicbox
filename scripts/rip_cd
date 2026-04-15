@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# rip_cd — insert a CD, run this script, get MP3s.
+#
+# Usage:
+#   bash /path/to/musicbox/scripts/rip_cd
+#
+# What it does:
+#   1. Installs missing apt and pip dependencies (requires sudo on first run).
+#   2. Runs code/rip_cd.py, which rips the CD, fetches album art, and ejects.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# ── Install dependencies if anything is missing ─────────────────────────────
+
+DEPS_OK=true
+
+for cmd in cdparanoia lame eject; do
+    command -v "$cmd" &>/dev/null || { DEPS_OK=false; break; }
+done
+
+for pkg in discid musicbrainzngs requests; do
+    python3 -c "import $pkg" 2>/dev/null || { DEPS_OK=false; break; }
+done
+
+if [[ "$DEPS_OK" == false ]]; then
+    echo "[rip_cd] Some dependencies are missing. Installing (may prompt for sudo)..."
+    sudo bash "$SCRIPT_DIR/install_dependencies.sh"
+fi
+
+# ── Run the ripper ───────────────────────────────────────────────────────────
+
+exec python3 "$REPO_ROOT/code/rip_cd.py" "$@"
