@@ -112,16 +112,20 @@ def find_drive_with_disc() -> str:
     return loaded[0]
 
 
-def lookup_release(device: str) -> tuple:
-    """Read disc TOC, look up MusicBrainz. Return (release_dict, discid_object)."""
+def read_disc(device: str):
+    """Read the disc TOC and return a discid object."""
     import discid
-    import musicbrainzngs
-
-    musicbrainzngs.set_useragent(APP_NAME, APP_VERSION, APP_CONTACT)
-
     logger.info("Reading disc TOC from %s ...", device)
     disc = discid.read(device)
     logger.info("Disc ID: %s", disc.id)
+    return disc
+
+
+def lookup_release(disc) -> dict | None:
+    """Look up the disc on MusicBrainz. Returns release dict or None if not found."""
+    import musicbrainzngs
+
+    musicbrainzngs.set_useragent(APP_NAME, APP_VERSION, APP_CONTACT)
 
     try:
         result = musicbrainzngs.get_releases_by_discid(
@@ -130,16 +134,12 @@ def lookup_release(device: str) -> tuple:
         )
     except musicbrainzngs.ResponseError as exc:
         if hasattr(exc, "cause") and getattr(exc.cause, "code", None) == 404:
-            raise SystemExit(
-                f"Disc not found in MusicBrainz (disc id={disc.id}).\n"
-                "The album may not be in the database. You can submit it at:\n"
-                f"  https://musicbrainz.org/cdtoc/attach?id={disc.id}"
-            )
+            return None
         raise
 
     releases = result.get("disc", {}).get("release-list", [])
     if not releases:
-        raise SystemExit("MusicBrainz returned no releases for this disc.")
+        return None
 
     if len(releases) > 1:
         logger.warning(
@@ -147,7 +147,7 @@ def lookup_release(device: str) -> tuple:
             len(releases),
             releases[0].get("title"),
         )
-    return releases[0], disc
+    return releases[0]
 
 
 def get_track_list(release: dict, disc_id: str) -> list[dict]:
@@ -238,17 +238,31 @@ def rip_cd() -> None:
     device = find_drive_with_disc()
     logger.info("Using CD drive: %s", device)
 
-    release, disc = lookup_release(device)
+    disc = read_disc(device)
+    release = lookup_release(disc)
 
-    artist = release.get("artist-credit-phrase") or "Unknown Artist"
-    album_title = release.get("title") or "Unknown Album"
-    year = (release.get("date") or "")[:4] or None
+    if release is None:
+        logger.warning(
+            "Disc not found in MusicBrainz (disc id=%s).\n"
+            "  Track names, artist, album title, and cover art will be missing.\n"
+            "  You can add this disc at: https://musicbrainz.org/cdtoc/attach?id=%s\n"
+            "  Proceeding with rip using numbered tracks only.",
+            disc.id, disc.id,
+        )
+        artist = "Unknown Artist"
+        album_title = "Unknown Album"
+        year = None
+        track_list = []
+    else:
+        artist = release.get("artist-credit-phrase") or "Unknown Artist"
+        album_title = release.get("title") or "Unknown Album"
+        year = (release.get("date") or "")[:4] or None
+        track_list = get_track_list(release, disc.id)
 
     logger.info("Album:  %s", album_title)
     logger.info("Artist: %s", artist)
     logger.info("Year:   %s", year or "unknown")
 
-    track_list = get_track_list(release, disc.id)
     total_tracks = disc.last_track_num - disc.first_track_num + 1
 
     dest_folder = music_root() / "Unsorted" / sanitize(f"{artist} - {album_title}")
@@ -256,30 +270,29 @@ def rip_cd() -> None:
     logger.info("Output folder: %s", dest_folder)
 
     # Cover art
-    cover_art = fetch_cover_art(release["id"])
-    if cover_art:
-        cover_path = dest_folder / "cover.jpg"
-        cover_path.write_bytes(cover_art)
-        logger.info("Saved cover art (%d KB) -> %s", len(cover_art) // 1024, cover_path)
-    else:
-        logger.warning("No cover art found for this release.")
+    if release is not None:
+        cover_art = fetch_cover_art(release["id"])
+        if cover_art:
+            cover_path = dest_folder / "cover.jpg"
+            cover_path.write_bytes(cover_art)
+            logger.info("Saved cover art (%d KB) -> %s", len(cover_art) // 1024, cover_path)
+        else:
+            logger.warning("No cover art found for this release.")
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp = Path(tmp_dir)
         for track_num in range(disc.first_track_num, disc.last_track_num + 1):
             idx = track_num - disc.first_track_num
-            track_title = "Unknown"
+            track_title = f"Track {track_num:02d}"
             if idx < len(track_list):
                 recording = track_list[idx].get("recording", {})
                 track_title = (
                     recording.get("title")
                     or track_list[idx].get("title")
-                    or "Unknown"
+                    or track_title
                 )
 
-            logger.info(
-                "Track %d/%d: %s", track_num, total_tracks, track_title
-            )
+            logger.info("Track %d/%d: %s", track_num, total_tracks, track_title)
 
             wav = tmp / f"track{track_num:02d}.wav"
             mp3_name = sanitize(f"{track_num:02d} {track_title}.mp3")
