@@ -44,6 +44,7 @@ APT_PACKAGES=(
     lame          # MP3 encoder
     eject         # eject the CD tray when done
     libdiscid0    # C library used by python discid package
+    libcdio-utils # provides cd-info for reading CD-Text from the disc itself
 
     # Python3 (may already be present on Pi / desktop)
     python3

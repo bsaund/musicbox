@@ -11,7 +11,7 @@ Workflow:
   6. Ejects the CD when done.
 
 System dependencies (install once):
-  sudo apt install cdparanoia lame eject libdiscid0
+  sudo apt install cdparanoia lame eject libdiscid0 libcdio-utils
 
 Python dependencies:
   sudo pip3 install discid musicbrainzngs requests
@@ -119,6 +119,65 @@ def read_disc(device: str):
     disc = discid.read(device)
     logger.info("Disc ID: %s", disc.id)
     return disc
+
+
+def read_cdtext(device: str) -> dict:
+    """
+    Try to read CD-Text embedded in the disc itself.
+
+    CD-Text is an optional extension (1996) that some commercial CDs include,
+    storing album title, artist, and per-track titles in the disc's subcode data.
+    Requires the 'cd-info' tool from the libcdio-utils package.
+
+    Returns a dict with keys:
+      'album'   : str or None
+      'artist'  : str or None
+      'tracks'  : list of str (track titles, 1-indexed so index 0 == track 1)
+    """
+    empty = {"album": None, "artist": None, "tracks": []}
+
+    if not shutil.which("cd-info"):
+        logger.debug("cd-info not found; skipping CD-Text read (apt install libcdio-utils)")
+        return empty
+
+    try:
+        result = subprocess.run(
+            ["cd-info", "--no-header", "--no-device-info", "--no-disc-mode",
+             "--cdtext", "-C", device],
+            capture_output=True, text=True, timeout=15,
+        )
+        output = result.stdout
+    except Exception as exc:
+        logger.debug("cd-info failed: %s", exc)
+        return empty
+
+    album, artist = None, None
+    tracks: list[str] = []
+
+    for line in output.splitlines():
+        line = line.strip()
+        # Disc-level CD-Text
+        if line.startswith("CD-Text for Disc:") or line.startswith("Disc"):
+            pass
+        if "TITLE:" in line and "Track" not in line:
+            album = line.split("TITLE:", 1)[1].strip().strip("'\"")
+        if "PERFORMER:" in line and "Track" not in line:
+            artist = line.split("PERFORMER:", 1)[1].strip().strip("'\"")
+        # Track-level CD-Text:  "  3: TITLE: ..."
+        if line and line[0].isdigit() and "TITLE:" in line:
+            title = line.split("TITLE:", 1)[1].strip().strip("'\"")
+            if title:
+                tracks.append(title)
+
+    if album or artist or tracks:
+        logger.info(
+            "CD-Text found: album=%r artist=%r tracks=%d",
+            album, artist, len(tracks),
+        )
+    else:
+        logger.info("No CD-Text found on this disc.")
+
+    return {"album": album, "artist": artist, "tracks": tracks}
 
 
 def lookup_release(disc) -> dict | None:
@@ -243,16 +302,23 @@ def rip_cd() -> None:
 
     if release is None:
         logger.warning(
-            "Disc not found in MusicBrainz (disc id=%s).\n"
-            "  Track names, artist, album title, and cover art will be missing.\n"
-            "  You can add this disc at: https://musicbrainz.org/cdtoc/attach?id=%s\n"
-            "  Proceeding with rip using numbered tracks only.",
+            "Disc not found in MusicBrainz (disc id=%s). "
+            "You can submit it at: https://musicbrainz.org/cdtoc/attach?id=%s",
             disc.id, disc.id,
         )
-        artist = "Unknown Artist"
-        album_title = "Unknown Album"
+        cdtext = read_cdtext(device)
+        artist = cdtext["artist"] or "Unknown Artist"
+        album_title = cdtext["album"] or "Unknown Album"
         year = None
-        track_list = []
+        track_list = cdtext["tracks"]  # plain strings, handled below
+        if cdtext["artist"] or cdtext["album"]:
+            logger.info("Using CD-Text for metadata: artist=%r album=%r", artist, album_title)
+        else:
+            logger.warning(
+                "No CD-Text on disc either. "
+                "Tracks will be named 'Track 01', 'Track 02', etc. "
+                "Cover art will not be available."
+            )
     else:
         artist = release.get("artist-credit-phrase") or "Unknown Artist"
         album_title = release.get("title") or "Unknown Album"
@@ -285,12 +351,18 @@ def rip_cd() -> None:
             idx = track_num - disc.first_track_num
             track_title = f"Track {track_num:02d}"
             if idx < len(track_list):
-                recording = track_list[idx].get("recording", {})
-                track_title = (
-                    recording.get("title")
-                    or track_list[idx].get("title")
-                    or track_title
-                )
+                entry = track_list[idx]
+                if isinstance(entry, str):
+                    # CD-Text track list is plain strings
+                    track_title = entry or track_title
+                else:
+                    # MusicBrainz track list is dicts
+                    recording = entry.get("recording", {})
+                    track_title = (
+                        recording.get("title")
+                        or entry.get("title")
+                        or track_title
+                    )
 
             logger.info("Track %d/%d: %s", track_num, total_tracks, track_title)
 
