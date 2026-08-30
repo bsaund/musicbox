@@ -54,6 +54,42 @@ def load_config_file():
     return out
 
 
+class BarcodeConfig:
+    """Barcode-to-folder mapping that reloads when the synced config file changes."""
+
+    def __init__(self):
+        self._fp = pathlib.Path(BASE_FP) / CONFIG_FILENAME
+        self._mtime = None
+        self._cfg = {}
+        self.refresh()
+
+    def _current_mtime(self):
+        try:
+            return self._fp.stat().st_mtime
+        except OSError:
+            return None
+
+    def refresh(self):
+        mtime = self._current_mtime()
+        if mtime == self._mtime:
+            return
+        try:
+            self._cfg = load_config_file()
+            self._mtime = mtime
+        except (json.JSONDecodeError, OSError):
+            # A partially-synced file can be unreadable; keep the old mapping
+            # and retry on the next scan.
+            logger.exception("Could not reload config file %s; keeping %d entries",
+                             self._fp, len(self._cfg))
+
+    def lookup(self, barcode_id):
+        self.refresh()
+        return self._cfg.get(barcode_id)
+
+    def __len__(self):
+        return len(self._cfg)
+
+
 def add_all_songs_from_folder(folder):
     d = pathlib.Path(BASE_FP) / folder
     # Specific handling for radio streams
@@ -122,11 +158,12 @@ def play_latest_scan():
 
     logger.info("Scanner device ready: %s", BARCODE_SCANNER_FILEPATH)
 
-    cfg = load_config_file()
+    cfg = BarcodeConfig()
     while True:
         try:
             barcode_id = scanner.read_scan()
-            if barcode_id not in cfg:
+            barcode_command = cfg.lookup(barcode_id)
+            if barcode_command is None:
                 logger.error(
                     "Unknown barcode id %s — not in config %s (%d entries loaded)",
                     barcode_id,
@@ -134,7 +171,6 @@ def play_latest_scan():
                     len(cfg),
                 )
                 continue
-            barcode_command = cfg[barcode_id]
             if barcode_command.startswith("Controls/"):
                 barcode_command = barcode_command.lstrip("Controls/")
                 handle_control_scan(barcode_command)

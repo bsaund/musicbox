@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# generate_booklet — regenerate the printable barcode booklet (directory.pdf).
+#
+# Usage:
+#   bash /path/to/musicbox/scripts/generate_booklet
+#
+# What it does:
+#   Runs code/barcode_map.py, which scans the music root for playlists,
+#   updates .barcode_config, regenerates the barcode images, and writes
+#   directory.pdf (print it double-sided) to the music root.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# ── Install dependencies if anything is missing ─────────────────────────────
+
+DEPS_OK=true
+
+for pkg in barcode fpdf; do
+    python3 -c "import $pkg" 2>/dev/null || { DEPS_OK=false; break; }
+done
+
+if [[ "$DEPS_OK" == false ]]; then
+    echo "[generate_booklet] Some dependencies are missing. Installing..."
+    bash "$SCRIPT_DIR/install_dependencies.sh"
+fi
+
+# ── Generate the booklet ────────────────────────────────────────────────────
+
+exec python3 "$REPO_ROOT/code/barcode_map.py" "$@"

@@ -6,6 +6,7 @@ from musicbox_paths import music_root
 from barcode import EAN8
 from barcode.writer import ImageWriter
 from fpdf import FPDF
+from fpdf.enums import XPos, YPos
 from collections import defaultdict
 
 BASE_FP = music_root()
@@ -112,20 +113,19 @@ class PDF(FPDF):
     def footer(self):
         # Position at 1.5 cm from bottom
         self.set_y(-15)
-        # Arial italic 8
-        self.set_font('Arial', 'I', 8)
+        self.set_font('Helvetica', 'I', 8)
         self.set_text_color(90)
-        self.cell(0, 10, f'Page {self.page_no()}: {self.section_name}', 0, 0, 'C')
+        self.cell(0, 10, f'Page {self.page_no()}: {self.section_name}', border=0, align='C')
 
     def header(self):
         # self.text()
         # pass
         prev_y = self.get_y()
         self.set_y(5)
-        self.set_font('Arial', 'B', 16)
+        self.set_font('Helvetica', 'B', 16)
         alignment = 'R' if self.page_no() % 2 else 'L'
 
-        self.cell(0, 10, self.section_name, border=0, ln=0, align=alignment)
+        self.cell(0, 10, self.section_name, border=0, align=alignment)
         self.set_y(20)
 
     def add_section_title(self, title):
@@ -133,19 +133,19 @@ class PDF(FPDF):
         self.add_page()
         if self.page_no() % 2 == 0:
             self.add_page()
-        self.set_font('Arial', 'B', 60)
+        self.set_font('Helvetica', 'B', 60)
         # Background color
         # self.set_fill_color(200, 220, 255)
         # Title
         self.ln(50)
-        self.cell(0, 6, title, 0, 1, 'C')
+        self.cell(0, 6, title, border=0, align='C', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
         # Line break
         self.ln(50)
         self.section_name = title
 
     def add_section_barcodes(self, folders):
         fp = pathlib.Path(BASE_FP) / 'Barcodes'
-        self.set_font('Arial', '', 12)
+        self.set_font('Helvetica', '', 12)
         for folder in folders:
             if self.get_y() > 250:
                 self.add_page()
@@ -154,10 +154,10 @@ class PDF(FPDF):
             barcode = (fp / rel_fp).as_posix()
             clean_rel_fp = pathlib.Path(*rel_fp.parts[1:-1]).as_posix().encode('ascii', errors='ignore').decode()
             clean_name = rel_fp.parts[-1].encode('ascii', errors='ignore').decode()
-            self.set_font('Arial', '', 12)
+            self.set_font('Helvetica', '', 12)
             self.cell(30, 5, clean_rel_fp.replace('/', '  /  '))
             self.ln()
-            self.set_font('Arial', 'B', 12)
+            self.set_font('Helvetica', 'B', 12)
             self.cell(60, 5, clean_name)
             self.ln()
             img_y = self.get_y()
@@ -207,7 +207,7 @@ def generate_pdf():
     pdf.add_all_playlists(cf.values())
     fp = (pathlib.Path(BASE_FP) / 'directory.pdf').as_posix()
     print('Writing to file')
-    pdf.output(fp, "F")
+    pdf.output(fp)
     print(f'Wrote directory to {fp}')
 
 
