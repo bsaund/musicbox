@@ -5,9 +5,16 @@
 #   bash /path/to/musicbox/scripts/generate_booklet
 #
 # What it does:
-#   Runs code/barcode_map.py, which scans the music root for playlists,
-#   updates .barcode_config, regenerates the barcode images, and writes
-#   directory.pdf (print it double-sided) to the music root.
+#   1. Runs code/barcode_map.py, which scans the music root for playlists,
+#      updates .barcode_config, regenerates the barcode images, and writes
+#      directory.pdf (print it double-sided) to the music root.
+#   2. Waits for the local Dropbox client to finish uploading, then triggers
+#      an immediate rclone pull on the Pi (ssh host "raspi") so new barcodes
+#      are scannable right away instead of waiting for the hourly cron sync.
+#      Both steps are skipped with a warning if unavailable.
+#
+# Environment:
+#   MUSICBOX_PI_HOST  ssh host for the Pi (default: raspi; set empty to skip)
 
 set -euo pipefail
 
@@ -29,4 +36,38 @@ fi
 
 # ── Generate the booklet ────────────────────────────────────────────────────
 
-exec python3 "$REPO_ROOT/code/barcode_map.py" "$@"
+python3 "$REPO_ROOT/code/barcode_map.py" "$@"
+
+# ── Push the update to the Pi ───────────────────────────────────────────────
+# Best-effort: the booklet is already generated, so a Pi that is off or a
+# machine without the Dropbox CLI only costs us the instant sync, not the run.
+
+PI_HOST="${MUSICBOX_PI_HOST-raspi}"
+
+if [[ -z "$PI_HOST" ]]; then
+    exit 0
+fi
+
+if command -v dropbox &>/dev/null; then
+    echo "[generate_booklet] Waiting for Dropbox to finish uploading..."
+    for _ in $(seq 1 60); do
+        dropbox status 2>/dev/null | grep -q "Up to date" && break
+        sleep 2
+    done
+    if ! dropbox status 2>/dev/null | grep -q "Up to date"; then
+        echo "[generate_booklet] WARNING: Dropbox still syncing after 2 minutes;" \
+             "the Pi may pull a stale copy. Re-run the sync later with:"
+        echo "    ssh $PI_HOST 'rclone sync dropbox_music:/Music ~/Dropbox/Music'"
+    fi
+else
+    echo "[generate_booklet] WARNING: dropbox CLI not found; assuming upload is done."
+fi
+
+echo "[generate_booklet] Triggering rclone sync on $PI_HOST..."
+if ssh -o ConnectTimeout=5 -o BatchMode=yes "$PI_HOST" \
+        "rclone sync dropbox_music:/Music ~/Dropbox/Music"; then
+    echo "[generate_booklet] Pi synced. New barcodes are ready to scan."
+else
+    echo "[generate_booklet] WARNING: could not sync $PI_HOST (off or unreachable?)."
+    echo "    The Pi's hourly cron will pick up the changes instead."
+fi
